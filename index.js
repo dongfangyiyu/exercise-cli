@@ -2,6 +2,8 @@
 
 var fs = require('fs');
 var path = require('path');
+var inquirer = require('inquirer');
+var chalk = require('chalk');
 
 var program = require('commander');
 program
@@ -11,9 +13,114 @@ program
     .description('yo yo check now')
     .option('-a, --name [moduleName]', '模块名称')
     .action((checkname,option) => {
-        console.log('指令 install 后面跟的参数值 checkname: ' + checkname);
-		console.log(option);
+		// console.log('指令 install 后面跟的参数值 checkname: ' + checkname);
+		// console.log(option);
 		// 获得了参数，可以在这里做响应的业务处理
+		var prompList = [
+			{
+				type:'input',
+				message:'姓名',
+				name:'name'
+			},{
+				type:'input',
+				message:'手机号',
+				name:'phone',
+				validate:val=>{
+					if(val.match(/\d{11}/g)){
+						return true
+					}
+					return '请输入11位数字'
+				}
+			},{
+				type:'confirm',
+				message:'是否参加本次考核？',
+				name:'assess',
+				prefix:'前缀'
+			},{
+				type:'confirm',
+				message:'是否同意本次考核须知？',
+				name:'notice',
+				suffix:'后缀',
+				when:answers=>{
+					return answers.assess
+				}
+			},{
+				type:'list',
+				message:'欢迎来到本次考核，请选择学历：',
+				name:'eductionBg',
+				choices:[
+					"大专",
+					"本科",
+					"本科以上"
+				],
+				filter:val=>{//将选择的内容后面加学历
+					return val+'学历'
+				}
+			},{
+				type:'rawlist',
+				message:'请选择你爱玩的游戏：',
+				name:'game',
+				choices:[
+					"LOL",
+					"DOTA",
+					"PUBG"
+				]
+			},{
+				type:'expand',
+					message:'请选择你喜欢的水果：',
+					name:'fruit',
+					choices: [
+					{
+						key: "a",
+						name: "Apple",
+						value: "apple"
+					},
+					{
+						key: "O",
+						name: "Orange",
+						value: "orange"
+					},
+					{
+						key: "p",
+						name: "Pear",
+						value: "pear"
+					}
+				]
+			},{
+				type:'checkbox',
+				message:'请选择你喜欢的颜色：',
+				name:'color',
+				choices:[
+					{
+						name: "red"
+					},
+					new inquirer.Separator(), // 添加分隔符
+					{
+						name: "blur",
+						checked: true // 默认选中
+					},
+					{
+						name: "green"
+					},
+					new inquirer.Separator("--- 分隔符 ---"), // 自定义分隔符
+					{
+						name: "yellow"
+					}
+				]
+			},{
+				type:'password',
+				message:'请输入你的游戏密码：',
+				name:'pwd'
+			}
+			
+		]
+		inquirer.prompt(prompList).then(answers=>{
+			console.log(answers);
+			console.log(chalk.green('考核完成'))
+			console.log(chalk.blue('你最棒了'))
+			console.log(chalk.blue.bgRed('五一放假喽')) //支持设置背景
+			console.log(chalk.blue(answers))
+		})
     })
 	//自定义帮助信息
     .on('--help', function() {
@@ -87,5 +194,5 @@ mkdir(PATH+'/public',function(){
 		}
 	})
 })
-console.log('拷贝成功');
+// console.log('拷贝成功');
 // console.log(process.argv);
